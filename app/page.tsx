@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Sun, Moon, History } from 'lucide-react';
 import { Gender, HistoryItem } from '@/lib/types';
 import { calculateBMI, getBMICategory } from '@/lib/utils';
@@ -20,18 +19,6 @@ export default function BMICalculator() {
   const [showResult, setShowResult] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-
-  // Load history from localStorage
-  useEffect(() => {
-    const savedHistory = localStorage.getItem('bmi-history');
-    if (savedHistory) {
-      try {
-        setHistory(JSON.parse(savedHistory));
-      } catch (error) {
-        console.error('Failed to load history:', error);
-      }
-    }
-  }, []);
 
   const result = getBMICategory(calculateBMI(weight, height));
 
@@ -52,16 +39,9 @@ export default function BMICalculator() {
       category: result.category
     };
 
-    // Add to history (keep last 10 records)
+    // Add to history (keep last 10 records) - stored in memory only
     const newHistory = [newRecord, ...history].slice(0, 10);
     setHistory(newHistory);
-    
-    // Save to localStorage
-    try {
-      localStorage.setItem('bmi-history', JSON.stringify(newHistory));
-    } catch (error) {
-      console.error('Failed to save history:', error);
-    }
 
     setShowResult(true);
   };
@@ -167,13 +147,12 @@ export default function BMICalculator() {
         </div>
 
         {/* Calculate Button */}
-        <motion.button
-          whileTap={{ scale: 0.95 }}
+        <button
           onClick={handleCalculate}
-          className="w-full py-4 rounded-2xl bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 transition-colors"
+          className="w-full py-4 rounded-2xl bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 transition-colors active:scale-95"
         >
           Let's Go
-        </motion.button>
+        </button>
       </div>
     </div>
   );
