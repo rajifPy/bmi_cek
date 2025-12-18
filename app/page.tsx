@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Sun, Moon, History, User, Share2, Heart, TrendingUp, Activity, Info, X, ChevronLeft, Download } from 'lucide-react';
 
 type Gender = 'male' | 'female';
@@ -153,24 +153,59 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
   const resultRef = useRef<HTMLDivElement>(null);
   const weightDiff = weight - ((result.idealWeight.min + result.idealWeight.max) / 2);
   const progressPct = Math.min((result.bmi / 45) * 100, 100);
+  const [exporting, setExporting] = useState(false);
 
   const exportToPDF = async () => {
     if (!resultRef.current) return;
+    setExporting(true);
     
     try {
-      const html2pdf = (await import('html2pdf.js')).default;
+      const html2canvas = (window as any).html2canvas;
+      const jsPDF = (window as any).jspdf.jsPDF;
       
-      const opt = {
-        margin: 10,
-        filename: `Hasil-BMI-${new Date().toLocaleDateString('id-ID')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      await html2pdf().set(opt).from(resultRef.current).save();
+      if (!html2canvas || !jsPDF) {
+        alert('Memuat library PDF...');
+        return;
+      }
+      
+      const canvas = await html2canvas(resultRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: isDark ? '#111827' : '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`Hasil-IMT-${new Date().toLocaleDateString('id-ID')}.pdf`);
     } catch (error) {
-      alert('Fitur export PDF akan segera tersedia!');
+      console.error('Export error:', error);
+      alert('Fitur export PDF: Gunakan Print to PDF dari browser Anda sebagai alternatif (Ctrl+P atau Cmd+P)');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const text = `IMT saya adalah ${result.bmi} (${result.category})!`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch (err) {
+        console.log('Share canceled');
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      alert('✓ Disalin ke clipboard!');
     }
   };
 
@@ -183,14 +218,13 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
           </button>
           <h2 className="text-xl font-bold">Hasil Perhitungan</h2>
           <div className="flex gap-2">
-            <button onClick={exportToPDF} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
-              <Download className="w-5 h-5 text-green-600" />
+            <button 
+              onClick={exportToPDF} 
+              disabled={exporting}
+              className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg ${exporting ? 'opacity-50' : ''}`}>
+              <Download className={`w-5 h-5 text-green-600 ${exporting ? 'animate-bounce' : ''}`} />
             </button>
-            <button onClick={async () => {
-              const text = `IMT saya adalah ${result.bmi} (${result.category})!`;
-              if (navigator.share) await navigator.share({ text }).catch(() => {});
-              else { await navigator.clipboard.writeText(text); alert('✓ Disalin!'); }
-            }} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+            <button onClick={handleShare} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
               <Share2 className="w-5 h-5 text-blue-600" />
             </button>
             <button onClick={onToggleTheme} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
