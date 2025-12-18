@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Sun, Moon, History, User, Share2, Heart, TrendingUp, Activity, Info, X, ChevronLeft } from 'lucide-react';
-
-// ... sisa kode tetap sama
+import React, { useState, useEffect, useRef } from 'react';
+import { Sun, Moon, History, User, Share2, Heart, TrendingUp, Activity, Info, X, ChevronLeft, Download } from 'lucide-react';
 
 type Gender = 'male' | 'female';
 
@@ -45,40 +43,40 @@ const getBMICategory = (bmi: number, height: number): BMIResult => {
   const idealWeight = calculateIdealWeight(height);
   
   if (bmi < 16) return {
-    bmi, category: 'Severely Underweight', color: '#ef4444', healthRisk: 'High Risk',
-    recommendation: 'Consult a healthcare professional immediately. Your BMI indicates severe underweight.',
+    bmi, category: 'Sangat Kurus', color: '#ef4444', healthRisk: 'Risiko Tinggi',
+    recommendation: 'Segera konsultasi dengan tenaga kesehatan profesional. IMT Anda menunjukkan kondisi sangat kurus.',
     idealWeight,
-    tips: ['Seek immediate medical attention', 'Work with a nutritionist for meal planning', 'Consider high-calorie nutrient-dense foods', 'Monitor your health regularly']
+    tips: ['Segera cari bantuan medis', 'Bekerja sama dengan ahli gizi untuk perencanaan makan', 'Pertimbangkan makanan berkalori tinggi dan bergizi', 'Pantau kesehatan Anda secara teratur']
   };
   
   if (bmi < 18.5) return {
-    bmi, category: 'Underweight', color: '#10b981', healthRisk: 'Moderate Risk',
-    recommendation: 'You need to gain weight with a healthy and nutritious diet.', idealWeight,
-    tips: ['Eat more frequently with nutrient-dense foods', 'Include protein in every meal', 'Add healthy fats like nuts and avocados', 'Consider strength training exercises']
+    bmi, category: 'Kurus', color: '#10b981', healthRisk: 'Risiko Sedang',
+    recommendation: 'Anda perlu menambah berat badan dengan pola makan sehat dan bergizi.', idealWeight,
+    tips: ['Makan lebih sering dengan makanan padat gizi', 'Sertakan protein dalam setiap makanan', 'Tambahkan lemak sehat seperti kacang dan alpukat', 'Pertimbangkan latihan kekuatan']
   };
   
   if (bmi < 25) return {
-    bmi, category: 'Normal Weight', color: '#3b82f6', healthRisk: 'Low Risk',
-    recommendation: 'Excellent! Your weight is ideal. Maintain a healthy lifestyle with regular exercise.', idealWeight,
-    tips: ['Continue balanced diet and exercise', 'Stay hydrated with 8 glasses of water daily', 'Get 7-8 hours of quality sleep', 'Regular health check-ups recommended']
+    bmi, category: 'Normal', color: '#3b82f6', healthRisk: 'Risiko Rendah',
+    recommendation: 'Sangat baik! Berat badan Anda ideal. Pertahankan gaya hidup sehat dengan olahraga teratur.', idealWeight,
+    tips: ['Lanjutkan pola makan seimbang dan olahraga', 'Tetap terhidrasi dengan 8 gelas air sehari', 'Tidur berkualitas 7-8 jam', 'Pemeriksaan kesehatan rutin dianjurkan']
   };
   
   if (bmi < 30) return {
-    bmi, category: 'Overweight', color: '#f59e0b', healthRisk: 'Moderate Risk',
-    recommendation: 'Consider losing weight with regular exercise and a healthy diet.', idealWeight,
-    tips: ['Start with 30 minutes of cardio daily', 'Reduce sugar and processed foods', 'Eat more vegetables and lean protein', 'Track your daily calorie intake']
+    bmi, category: 'Kelebihan Berat Badan', color: '#f59e0b', healthRisk: 'Risiko Sedang',
+    recommendation: 'Pertimbangkan untuk menurunkan berat badan dengan olahraga teratur dan pola makan sehat.', idealWeight,
+    tips: ['Mulai dengan kardio 30 menit setiap hari', 'Kurangi gula dan makanan olahan', 'Makan lebih banyak sayuran dan protein tanpa lemak', 'Pantau asupan kalori harian Anda']
   };
   
   if (bmi < 35) return {
-    bmi, category: 'Obese Class I', color: '#ef4444', healthRisk: 'High Risk',
-    recommendation: 'Consult with a doctor for a safe weight loss program.', idealWeight,
-    tips: ['Seek professional medical guidance', 'Create a sustainable meal plan', 'Start with low-impact exercises', 'Consider joining a support group']
+    bmi, category: 'Obesitas Kelas I', color: '#ef4444', healthRisk: 'Risiko Tinggi',
+    recommendation: 'Konsultasi dengan dokter untuk program penurunan berat badan yang aman.', idealWeight,
+    tips: ['Cari bimbingan medis profesional', 'Buat rencana makan yang berkelanjutan', 'Mulai dengan latihan ringan', 'Pertimbangkan untuk bergabung dengan kelompok dukungan']
   };
   
   return {
-    bmi, category: 'Obese Class II', color: '#dc2626', healthRisk: 'Very High Risk',
-    recommendation: 'Medical intervention recommended. Consult healthcare professional immediately.', idealWeight,
-    tips: ['Immediate medical consultation required', 'Follow prescribed treatment plan', 'Regular monitoring essential', 'Consider medically supervised programs']
+    bmi, category: 'Obesitas Kelas II', color: '#dc2626', healthRisk: 'Risiko Sangat Tinggi',
+    recommendation: 'Intervensi medis direkomendasikan. Segera konsultasi dengan tenaga kesehatan profesional.', idealWeight,
+    tips: ['Konsultasi medis segera diperlukan', 'Ikuti rencana perawatan yang diresepkan', 'Pemantauan rutin sangat penting', 'Pertimbangkan program yang diawasi secara medis']
   };
 };
 
@@ -92,7 +90,7 @@ const GenderSelector = ({ selected, onChange, isDark }: { selected: Gender; onCh
             : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-750' : 'bg-white text-gray-600 hover:bg-gray-50'
         }`}>
         <User className="w-5 h-5" />
-        <span className="capitalize">{g}</span>
+        <span>{g === 'male' ? 'Laki-laki' : 'Perempuan'}</span>
       </button>
     ))}
   </div>
@@ -129,7 +127,7 @@ const HeightSlider = ({ value, onChange, isDark }: { value: number; onChange: (v
         style={{ top: `${((220 - value) / 120) * 100}%`, transform: 'translateY(-50%)' }} />
       <div className="absolute left-0 right-0 bottom-0 text-center pointer-events-none">
         <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">{value}</div>
-        <div className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>centimeters</div>
+        <div className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>sentimeter</div>
       </div>
     </div>
   );
@@ -152,8 +150,29 @@ const InputCounter = ({ label, value, onChange, isDark, unit }: { label: string;
 );
 
 const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onToggleTheme }: any) => {
+  const resultRef = useRef<HTMLDivElement>(null);
   const weightDiff = weight - ((result.idealWeight.min + result.idealWeight.max) / 2);
   const progressPct = Math.min((result.bmi / 45) * 100, 100);
+
+  const exportToPDF = async () => {
+    if (!resultRef.current) return;
+    
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+      
+      const opt = {
+        margin: 10,
+        filename: `Hasil-BMI-${new Date().toLocaleDateString('id-ID')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      await html2pdf().set(opt).from(resultRef.current).save();
+    } catch (error) {
+      alert('Fitur export PDF akan segera tersedia!');
+    }
+  };
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'} transition-colors`}>
@@ -162,12 +181,15 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
           <button onClick={onBack} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <h2 className="text-xl font-bold">Your Results</h2>
+          <h2 className="text-xl font-bold">Hasil Perhitungan</h2>
           <div className="flex gap-2">
+            <button onClick={exportToPDF} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+              <Download className="w-5 h-5 text-green-600" />
+            </button>
             <button onClick={async () => {
-              const text = `My BMI is ${result.bmi} (${result.category})!`;
+              const text = `IMT saya adalah ${result.bmi} (${result.category})!`;
               if (navigator.share) await navigator.share({ text }).catch(() => {});
-              else { await navigator.clipboard.writeText(text); alert('✓ Copied!'); }
+              else { await navigator.clipboard.writeText(text); alert('✓ Disalin!'); }
             }} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
               <Share2 className="w-5 h-5 text-blue-600" />
             </button>
@@ -177,7 +199,7 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto pb-4">
+        <div ref={resultRef} className="flex-1 overflow-y-auto pb-4">
           <div className="flex flex-col items-center mb-6">
             <div className="relative mb-4">
               <svg className="w-64 h-64 -rotate-90" viewBox="0 0 100 100">
@@ -187,13 +209,13 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="text-6xl font-bold" style={{ color: result.color }}>{result.bmi}</div>
-                <div className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>BMI Score</div>
+                <div className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Skor IMT</div>
               </div>
             </div>
             <div className="text-3xl font-bold mb-2" style={{ color: result.color }}>{result.category}</div>
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
-              result.healthRisk.includes('Low') ? 'bg-green-100 text-green-700' :
-              result.healthRisk.includes('Moderate') ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+              result.healthRisk.includes('Rendah') ? 'bg-green-100 text-green-700' :
+              result.healthRisk.includes('Sedang') ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
             }`}>
               <Activity className="w-4 h-4" />{result.healthRisk}
             </div>
@@ -202,17 +224,17 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-6 shadow-xl mb-4`}>
             <div className="flex items-center gap-2 mb-3">
               <Info className="w-5 h-5 text-blue-600" />
-              <h3 className="font-bold text-lg">Assessment</h3>
+              <h3 className="font-bold text-lg">Penilaian</h3>
             </div>
             <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{result.recommendation}</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
             {[
-              { label: 'Height', value: height, unit: 'cm' },
-              { label: 'Weight', value: weight, unit: 'kg' },
-              { label: 'Age', value: age, unit: 'years' },
-              { label: 'Gender', value: gender, unit: '' }
+              { label: 'Tinggi', value: height, unit: 'cm' },
+              { label: 'Berat', value: weight, unit: 'kg' },
+              { label: 'Usia', value: age, unit: 'tahun' },
+              { label: 'Jenis Kelamin', value: gender === 'male' ? 'L' : 'P', unit: '' }
             ].map(item => (
               <div key={item.label} className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-4 text-center shadow-lg`}>
                 <div className={`text-xs mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{item.label}</div>
@@ -225,7 +247,7 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
           <div className={`${isDark ? 'bg-gray-800' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-3xl p-6 shadow-lg mb-4`}>
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-blue-600" />
-              <h3 className="font-bold text-lg">Ideal Weight Range</h3>
+              <h3 className="font-bold text-lg">Rentang Berat Badan Ideal</h3>
             </div>
             <div className="flex justify-between items-center mb-3">
               <div>
@@ -234,7 +256,7 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
               </div>
               <div className={`text-3xl ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>-</div>
               <div className="text-right">
-                <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Maximum</div>
+                <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Maksimum</div>
                 <div className="text-2xl font-bold text-blue-600">{result.idealWeight.max} kg</div>
               </div>
             </div>
@@ -242,8 +264,8 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
               <div className={`mt-4 p-3 rounded-xl ${weightDiff > 0 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
                 <p className="text-sm font-medium">
                   {weightDiff > 0 
-                    ? `You are ${Math.abs(weightDiff).toFixed(1)} kg above ideal range`
-                    : `You are ${Math.abs(weightDiff).toFixed(1)} kg below ideal range`}
+                    ? `Anda ${Math.abs(weightDiff).toFixed(1)} kg di atas rentang ideal`
+                    : `Anda ${Math.abs(weightDiff).toFixed(1)} kg di bawah rentang ideal`}
                 </p>
               </div>
             )}
@@ -252,7 +274,7 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-6 shadow-lg mb-6`}>
             <div className="flex items-center gap-2 mb-4">
               <Heart className="w-5 h-5 text-red-500" />
-              <h3 className="font-bold text-lg">Health Tips</h3>
+              <h3 className="font-bold text-lg">Tips Kesehatan</h3>
             </div>
             <ul className="space-y-3">
               {result.tips.map((tip: string, i: number) => (
@@ -268,7 +290,7 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
 
           <button onClick={onBack}
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg active:scale-95 transition-all">
-            Calculate Again
+            Hitung Lagi
           </button>
         </div>
       </div>
@@ -283,7 +305,7 @@ const HistoryScreen = ({ history, isDark, onBack, onToggleTheme, onClear }: any)
         <button onClick={onBack} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
           <ChevronLeft className="w-6 h-6" />
         </button>
-        <h2 className="text-xl font-bold">History</h2>
+        <h2 className="text-xl font-bold">Riwayat Perhitungan</h2>
         <div className="flex gap-2">
           {history.length > 0 && (
             <button onClick={onClear} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
@@ -301,8 +323,8 @@ const HistoryScreen = ({ history, isDark, onBack, onToggleTheme, onClear }: any)
           <div className={`w-24 h-24 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} flex items-center justify-center mb-4 shadow-lg`}>
             <History className={`w-12 h-12 ${isDark ? 'text-gray-600' : 'text-gray-400'}`} />
           </div>
-          <div className={`text-lg font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No History Yet</div>
-          <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Calculate your BMI to see it here</div>
+          <div className={`text-lg font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Belum Ada Riwayat</div>
+          <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Hitung IMT Anda untuk melihat riwayat</div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -313,7 +335,7 @@ const HistoryScreen = ({ history, isDark, onBack, onToggleTheme, onClear }: any)
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{item.date}</div>
-                    <div className="text-xl font-bold" style={{ color: cat.color }}>BMI {item.bmi}</div>
+                    <div className="text-xl font-bold" style={{ color: cat.color }}>IMT {item.bmi}</div>
                   </div>
                   <div className="px-3 py-1 rounded-full text-xs font-semibold"
                     style={{ backgroundColor: cat.color + '20', color: cat.color }}>
@@ -322,14 +344,14 @@ const HistoryScreen = ({ history, isDark, onBack, onToggleTheme, onClear }: any)
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-sm">
                   {[
-                    { label: 'Height', value: `${item.height} cm` },
-                    { label: 'Weight', value: `${item.weight} kg` },
-                    { label: 'Age', value: `${item.age} yo` },
-                    { label: 'Gender', value: item.gender }
+                    { label: 'Tinggi', value: `${item.height} cm` },
+                    { label: 'Berat', value: `${item.weight} kg` },
+                    { label: 'Usia', value: `${item.age} th` },
+                    { label: 'JK', value: item.gender === 'male' ? 'L' : 'P' }
                   ].map(d => (
                     <div key={d.label}>
                       <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{d.label}</div>
-                      <div className="font-semibold capitalize text-xs">{d.value}</div>
+                      <div className="font-semibold text-xs">{d.value}</div>
                     </div>
                   ))}
                 </div>
@@ -357,7 +379,7 @@ export default function BMICalculator() {
   const handleCalculate = () => {
     const newRecord: HistoryItem = {
       id: Date.now().toString(),
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
       weight, height, age, gender,
       bmi: result.bmi,
       category: result.category
@@ -377,8 +399,8 @@ export default function BMICalculator() {
       <div className="max-w-2xl mx-auto min-h-screen flex flex-col p-4 sm:p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Welcome 👋</div>
-            <div className="text-2xl font-bold">BMI Calculator</div>
+            <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Selamat Datang 👋</div>
+            <div className="text-2xl font-bold">Kalkulator IMT</div>
           </div>
           <div className="flex gap-2">
             <button onClick={() => setShowHistory(true)} className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg relative`}>
@@ -401,19 +423,19 @@ export default function BMICalculator() {
 
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className={`rounded-3xl p-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
-            <div className={`text-sm mb-4 font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Height</div>
+            <div className={`text-sm mb-4 font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Tinggi Badan</div>
             <HeightSlider value={height} onChange={setHeight} isDark={isDark} />
           </div>
 
           <div className="flex flex-col gap-4">
-            <InputCounter label="Weight" value={weight} onChange={(v) => setWeight(Math.max(30, Math.min(300, v)))} isDark={isDark} unit="kilograms" />
-            <InputCounter label="Age" value={age} onChange={(v) => setAge(Math.max(10, Math.min(120, v)))} isDark={isDark} unit="years old" />
+            <InputCounter label="Berat Badan" value={weight} onChange={(v) => setWeight(Math.max(30, Math.min(300, v)))} isDark={isDark} unit="kilogram" />
+            <InputCounter label="Usia" value={age} onChange={(v) => setAge(Math.max(10, Math.min(120, v)))} isDark={isDark} unit="tahun" />
           </div>
         </div>
 
         <button onClick={handleCalculate}
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl transition-all active:scale-95">
-          Calculate My BMI
+          Hitung IMT Saya
         </button>
       </div>
     </div>
