@@ -328,7 +328,7 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
           </button>
 
           <div className={`text-center mt-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-            <p className="text-xs">Made with ❤️ by <span className="font-semibold text-blue-600">murfhi</span></p>
+            <p className="text-xs">Terima Kasih by <span className="font-semibold text-blue-600">murfhi</span></p>
           </div>
         </div>
       </div>
