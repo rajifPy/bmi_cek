@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
-import { Gender } from '@/lib/types';
+import { Sun, Moon, History } from 'lucide-react';
+import { Gender, HistoryItem } from '@/lib/types';
 import { calculateBMI, getBMICategory } from '@/lib/utils';
 import GenderSelector from './components/GenderSelector';
 import HeightSlider from './components/HeightSlider';
 import InputCounter from './components/InputCounter';
 import ResultScreen from './components/ResultScreen';
+import HistoryScreen from './components/HistoryScreen';
 
 export default function BMICalculator() {
   const [isDark, setIsDark] = useState(false);
@@ -17,10 +18,51 @@ export default function BMICalculator() {
   const [weight, setWeight] = useState(70);
   const [age, setAge] = useState(23);
   const [showResult, setShowResult] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+
+  // Load history from localStorage
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('bmi-history');
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory));
+      } catch (error) {
+        console.error('Failed to load history:', error);
+      }
+    }
+  }, []);
 
   const result = getBMICategory(calculateBMI(weight, height));
 
   const handleCalculate = () => {
+    // Create new history record
+    const newRecord: HistoryItem = {
+      id: Date.now().toString(),
+      date: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }),
+      weight,
+      height,
+      age,
+      gender,
+      bmi: result.bmi,
+      category: result.category
+    };
+
+    // Add to history (keep last 10 records)
+    const newHistory = [newRecord, ...history].slice(0, 10);
+    setHistory(newHistory);
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('bmi-history', JSON.stringify(newHistory));
+    } catch (error) {
+      console.error('Failed to save history:', error);
+    }
+
     setShowResult(true);
   };
 
@@ -28,6 +70,23 @@ export default function BMICalculator() {
     setShowResult(false);
   };
 
+  const handleBackFromHistory = () => {
+    setShowHistory(false);
+  };
+
+  // Show History Screen
+  if (showHistory) {
+    return (
+      <HistoryScreen
+        history={history}
+        isDark={isDark}
+        onBack={handleBackFromHistory}
+        onToggleTheme={() => setIsDark(!isDark)}
+      />
+    );
+  }
+
+  // Show Result Screen
   if (showResult) {
     return (
       <ResultScreen
@@ -42,21 +101,37 @@ export default function BMICalculator() {
     );
   }
 
+  // Main Calculator Screen
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} transition-colors duration-300`}>
       <div className="max-w-md mx-auto min-h-screen flex flex-col p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <div className="text-sm text-gray-500 mb-1">Welcome 👋</div>
+            <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-1`}>
+              Welcome 👋
+            </div>
             <div className="text-2xl font-bold">BMI Calculator</div>
           </div>
-          <button
-            onClick={() => setIsDark(!isDark)}
-            className={`p-2 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
-          >
-            {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5" />}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowHistory(true)}
+              className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg relative`}
+            >
+              <History className="w-5 h-5" />
+              {history.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {history.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setIsDark(!isDark)}
+              className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
+            >
+              {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Gender Selection */}
@@ -95,7 +170,7 @@ export default function BMICalculator() {
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={handleCalculate}
-          className="w-full py-4 rounded-2xl bg-blue-600 text-white font-semibold shadow-lg"
+          className="w-full py-4 rounded-2xl bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 transition-colors"
         >
           Let's Go
         </motion.button>
