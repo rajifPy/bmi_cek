@@ -326,6 +326,10 @@ const ResultScreen = ({ result, height, weight, age, gender, isDark, onBack, onT
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg active:scale-95 transition-all">
             Hitung Lagi
           </button>
+
+          <div className={`text-center mt-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+            <p className="text-xs">Made with ❤️ by <span className="font-semibold text-blue-600">murfhi</span></p>
+          </div>
         </div>
       </div>
     </div>
@@ -471,6 +475,10 @@ export default function BMICalculator() {
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl transition-all active:scale-95">
           Hitung IMT Saya
         </button>
+
+        <div className={`text-center mt-6 pb-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+          <p className="text-sm">Web by <span className="font-semibold text-blue-600">murfhi</span></p>
+        </div>
       </div>
     </div>
   );
