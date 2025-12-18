@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { CSSProperties } from 'react';
 
 interface HeightSliderProps {
   value: number;
@@ -44,9 +45,8 @@ export default function HeightSlider({ value, onChange, isDark }: HeightSliderPr
         onChange={(e) => onChange(Number(e.target.value))}
         className="absolute left-3 top-0 h-full w-6 appearance-none bg-transparent cursor-pointer vertical-slider"
         style={{
-          writingMode: 'bt-lr',
           WebkitAppearance: 'slider-vertical',
-        }}
+        } as CSSProperties}
       />
 
       {/* Indicator bar */}
