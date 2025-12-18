@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 interface InputCounterProps {
   label: string;
   value: number;
@@ -19,20 +17,18 @@ export default function InputCounter({ label, value, onChange, isDark }: InputCo
         {value}
       </div>
       <div className="flex justify-center gap-4">
-        <motion.button
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={() => onChange(value - 1)}
-          className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg"
+          className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg active:scale-90 transition-transform"
         >
           -
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
+        </button>
+        <button
           onClick={() => onChange(value + 1)}
-          className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg"
+          className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg active:scale-90 transition-transform"
         >
           +
-        </motion.button>
+        </button>
       </div>
     </div>
   );
