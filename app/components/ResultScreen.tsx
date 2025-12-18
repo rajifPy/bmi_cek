@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Sun, Moon, Share2, Heart } from 'lucide-react';
 import { BMIResult } from '@/lib/types';
 
@@ -38,6 +37,9 @@ export default function ResultScreen({
     }
   };
 
+  // Calculate progress percentage (BMI scale up to 40)
+  const progressPercentage = Math.min((result.bmi / 40) * 100, 100);
+
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} transition-colors duration-300`}>
       <div className="max-w-md mx-auto min-h-screen flex flex-col p-6">
@@ -45,20 +47,20 @@ export default function ResultScreen({
         <div className="flex justify-between items-center mb-8">
           <button
             onClick={onBack}
-            className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg text-xl`}
+            className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg text-xl active:scale-95 transition-transform`}
           >
             ←
           </button>
           <div className="flex gap-2">
             <button
               onClick={handleShare}
-              className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
+              className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg active:scale-95 transition-transform`}
             >
               <Share2 className="w-5 h-5 text-blue-600" />
             </button>
             <button
               onClick={onToggleTheme}
-              className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
+              className={`p-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg active:scale-95 transition-transform`}
             >
               {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -66,28 +68,40 @@ export default function ResultScreen({
         </div>
 
         {/* Result Card */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="flex-1 flex flex-col items-center justify-center"
-        >
+        <div className="flex-1 flex flex-col items-center justify-center">
           {/* Circular BMI Display */}
           <div className={`rounded-full w-56 h-56 flex flex-col items-center justify-center ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-2xl mb-6 relative`}>
-            {/* Circular progress */}
-            <div 
-              className="absolute inset-0 rounded-full" 
-              style={{
-                background: `conic-gradient(${result.color} ${(result.bmi / 40) * 360}deg, transparent 0deg)`
-              }}
-            />
-            <div className={`absolute inset-3 rounded-full ${isDark ? 'bg-gray-800' : 'bg-white'}`} />
+            {/* Circular progress using SVG */}
+            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+              {/* Background circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="none"
+                stroke={isDark ? '#1f2937' : '#e5e7eb'}
+                strokeWidth="8"
+              />
+              {/* Progress circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="none"
+                stroke={result.color}
+                strokeWidth="8"
+                strokeDasharray={`${progressPercentage * 2.827} 282.7`}
+                strokeLinecap="round"
+                className="transition-all duration-500"
+              />
+            </svg>
             
             {/* BMI Value */}
             <div className="relative z-10">
               <div className="text-6xl font-bold mb-2" style={{ color: result.color }}>
                 {result.bmi}
               </div>
-              <div className={`text-xl ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <div className={`text-xl text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 BMI
               </div>
             </div>
@@ -136,14 +150,13 @@ export default function ResultScreen({
             </ul>
           </div>
 
-          <motion.button
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={onBack}
-            className="w-full py-4 rounded-2xl bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 transition-colors"
+            className="w-full py-4 rounded-2xl bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 transition-colors active:scale-95"
           >
             Calculate Again
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
       </div>
     </div>
   );
