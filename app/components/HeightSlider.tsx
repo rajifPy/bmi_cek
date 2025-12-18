@@ -26,7 +26,7 @@ export default function HeightSlider({ value, onChange, isDark }: HeightSliderPr
 
   return (
     <div
-      className="relative h-[280px] w-full touch-none"
+      className="relative h-[280px] w-full touch-none select-none"
       onMouseDown={() => setDragging(true)}
       onMouseUp={() => setDragging(false)}
       onMouseLeave={() => setDragging(false)}
@@ -35,11 +35,11 @@ export default function HeightSlider({ value, onChange, isDark }: HeightSliderPr
       onTouchEnd={() => setDragging(false)}
       onTouchMove={handleDrag}
     >
-      {/* Skala angka dan garis */}
+      {/* Scale numbers and lines */}
       {heights.map((h) => (
         <div
           key={h}
-          className="absolute left-0 right-0 flex items-center"
+          className="absolute left-0 right-0 flex items-center pointer-events-none"
           style={{ top: `${((190 - h) / 80) * 100}%` }}
         >
           <span className={`text-xs w-8 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -50,7 +50,7 @@ export default function HeightSlider({ value, onChange, isDark }: HeightSliderPr
       ))}
       
       {/* Bar indicator */}
-      <div className="absolute left-10 top-0 bottom-0 w-2 bg-gray-300 rounded-full overflow-hidden">
+      <div className="absolute left-10 top-0 bottom-0 w-2 bg-gray-300 rounded-full overflow-hidden pointer-events-none">
         <div
           className="absolute bottom-0 w-full bg-blue-600 transition-all duration-150"
           style={{ height: `${((value - 112) / 78) * 100}%` }}
@@ -60,13 +60,13 @@ export default function HeightSlider({ value, onChange, isDark }: HeightSliderPr
       {/* Draggable handle */}
       <div
         className={`absolute left-8 w-6 h-6 bg-blue-600 rounded-full shadow-lg ${
-          dragging ? 'cursor-grabbing scale-110' : 'cursor-grab'
-        } transition-transform`}
+          dragging ? 'scale-110 cursor-grabbing' : 'cursor-grab'
+        } transition-transform pointer-events-none`}
         style={{ top: `${((190 - value) / 78) * 100}%`, transform: 'translateY(-50%)' }}
       />
       
       {/* Value display */}
-      <div className="absolute left-0 right-0 bottom-0 text-center">
+      <div className="absolute left-0 right-0 bottom-0 text-center pointer-events-none">
         <div className="text-4xl font-bold text-blue-600">{value}</div>
         <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>cm</div>
       </div>
