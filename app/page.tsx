@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useRef } from 'react';
 import { Sun, Moon, History, User, Share2, Heart, TrendingUp, Activity, Info, X, ChevronLeft, Download } from 'lucide-react';
