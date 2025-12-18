@@ -1,5 +1,9 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Sun, Moon, History, User, Share2, Heart, TrendingUp, Activity, Info, X, ChevronLeft } from 'lucide-react';
+
+// ... sisa kode tetap sama
 
 type Gender = 'male' | 'female';
 
