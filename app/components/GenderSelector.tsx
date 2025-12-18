@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Male, Female } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Gender } from '@/lib/types';
 
 interface GenderSelectorProps {
@@ -24,7 +24,7 @@ export default function GenderSelector({ selected, onChange, isDark }: GenderSel
             : 'bg-white text-gray-600'
         }`}
       >
-        <Male className="w-5 h-5" />
+        <User className="w-5 h-5" />
         Male
       </motion.button>
       <motion.button
@@ -38,7 +38,7 @@ export default function GenderSelector({ selected, onChange, isDark }: GenderSel
             : 'bg-white text-gray-600'
         }`}
       >
-        <Female className="w-5 h-5" />
+        <User className="w-5 h-5" />
         Female
       </motion.button>
     </div>
